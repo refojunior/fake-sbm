@@ -4239,7 +4239,7 @@
                         <input type="number" id="nopes" class="form-control no-spinners" required tabindex="1" size="12" autocomplete="off" name="nomor" maxlength="12" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
                         <small id="nopes-help" class="form-text text-muted">Masukkan 12-digit nomor peserta UTBK-SBMPTN Anda.</small>
                     </div>   
-                    <div class="form-group">
+                    <div clas="form-group">
                         <label for="nopes">Nama Anda</label>
                         <input type="text" id="nama" class="form-control no-spinners" required tabindex="2" autocomplete="off" name="nama">
                         <small id="nopes-help" class="form-text text-muted">Masukan nama Anda.</small>
@@ -4297,27 +4297,32 @@
 						<small id="jurusan-help" class="form-text text-muted">Apakah Anda peserta bidik misi?</small>
 					</div>
 
-                    <div class="form-group">
-						<label for="kodeptn">PTN</label>
-						<select id="kodeptn" class="form-control no-spinners" tabindex="7" autocomplete="off" required="">
-							<option value="" selected="">-- Pilih PTN --</option>
-						</select>
-						<small id="kodeptn-help" class="form-text text-muted">Pilih PTN Anda.</small>
+					<div id="default-form">
+						<div class="form-group">
+							<label for="kodeptn">PTN (mau custom kampus? <a href="#" id="custom-form">klik disini</a>)</label>
+							<select id="kodeptn" class="form-control no-spinners" tabindex="7" autocomplete="off" required="">
+								<option value="" selected="">-- Pilih PTN --</option>
+							</select>
+							<small id="kodeptn-help" class="form-text text-muted">Pilih PTN Anda.</small>
+						</div>
+						<div class="form-group">
+							<label for="jurusan">Jurusan</label>
+							<select id="jurusan" class="form-control no-spinners" tabindex="8" autocomplete="off" required="">
+								<option value="" selected="">-- Pilih Jurusan --</option>
+							</select>
+							<small id="jurusan-help" class="form-text text-muted">Pilih Jurusan Anda.</small>
+						</div>
+						<div class="form-group">
+							<label for="prodi">Prodi</label>
+							<select id="prodi" class="form-control no-spinners" tabindex="9" autocomplete="off" required="">
+								<option value="" selected="">-- Pilih Prodi --</option>
+							</select>
+							<small id="prodi-help" class="form-text text-muted">Pilih Prodi Anda.</small>
+						</div>
 					</div>
-					<div class="form-group">
-						<label for="jurusan">Jurusan</label>
-						<select id="jurusan" class="form-control no-spinners" tabindex="8" autocomplete="off" required="">
-							<option value="" selected="">-- Pilih Jurusan --</option>
-						</select>
-						<small id="jurusan-help" class="form-text text-muted">Pilih Jurusan Anda.</small>
-					</div>
-					<div class="form-group">
-						<label for="prodi">Prodi</label>
-						<select id="prodi" class="form-control no-spinners" tabindex="9" autocomplete="off" required="">
-							<option value="" selected="">-- Pilih Prodi --</option>
-						</select>
-						<small id="prodi-help" class="form-text text-muted">Pilih Prodi Anda.</small>
-					</div>
+					<!-- custom form  -->
+					<div id="custom-form"></div>
+
                     <button id="search" class="btn btn-primary" type="submit">GAS KIBULIN!</button>
                     <br>
                 </form>
@@ -4438,31 +4443,57 @@
 	</div>
     <script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
     <script>
+		$(document).ready(function(){
+			$('#custom-form').click(function(e) {
+				e.preventDefault();
+				$('#default-form').remove();
+				$('#custom-form').append(`
+					
+					<div class="form-group">
+						<label for="kodeptn">PTN (mau custom kampus? <a href="#" id="custom-form">klik disini</a>)</label>
+						<input type="text" name="ptn" id="kodeptn" class="form-control" placeholder="contoh format: 111 - UNIVERSITAS NOMOR SATU">
+						<small id="kodeptn-help" class="form-text text-muted">Pilih PTN Anda.</small>
+					</div>
+					<div class="form-group d-none">
+						<label for="jurusan">Jurusan</label>
+						<input type="hidden" name="jurusan" id="jurusan" class="form-control" placeholder="hide this">
+						<small id="jurusan-help" class="form-text text-muted">Pilih Jurusan Anda.</small>
+					</div>
+					<div class="form-group">
+						<label for="prodi">Prodi</label>
+						<input type="text" name="prodi" id="prodi" class="form-control" placeholder="contoh format: 144155 - TEKNIK KEBAL">
+						<small id="prodi-help" class="form-text text-muted">Pilih Prodi Anda.</small>
+					</div>
+					
+				`)
+			});
+			
+			$('#sbm-form').submit(function(e){
+				e.preventDefault();
+				if($('#nopes').val().length != 12){
+					alert('nomor harus 12 digit!');
+				} else {
+					$('#main').hide();
+					$('#accepted').show();
+					var convert = $('#nopes').val().split("");
+					var no = convert[0] + convert[1] + convert[2] + " - " + convert[3] + convert[4] + convert[5] + " - " + convert[6] + convert[7] + " - " + convert[8] + convert[9] + convert[10] + convert[11]
+					var tgl_lahir = $('#day').val() + " - " + $('#month').val() + " - " + $('#year').val();
+					var ptn = $("#kodeptn").val().split(" - ");
+					var prodi = $('#prodi').val().split(" - ");
+					$('#no-peserta-diterima').html(no);
+					$('#nama-peserta-diterima').html($('#nama').val().toUpperCase());
+					$('#tgllahir-peserta-diterima').html(tgl_lahir);
+					$('#kode-ptn-terima').html(ptn[0]);
+					$('#nama-ptn-terima').html(ptn[1].toUpperCase());
+					$('#kode-prodi-terima').html(prodi[0]);
+					$('#nama-prodi-terima').html(prodi[1].toUpperCase());
+					if($('#bidikmisi').val() != 'tidak') {
+						$("#bidik-misi").show();
+					}
+				}
+			});
+		});
         
-        $('#sbm-form').submit(function(e){
-            e.preventDefault();
-            if($('#nopes').val().length != 12){
-                alert('nomor harus 12 digit!');
-            } else {
-                $('#main').hide();
-                $('#accepted').show();
-                var convert = $('#nopes').val().split("");
-                var no = convert[0] + convert[1] + convert[2] + " - " + convert[3] + convert[4] + convert[5] + " - " + convert[6] + convert[7] + " - " + convert[8] + convert[9] + convert[10] + convert[11]
-                var tgl_lahir = $('#day').val() + " - " + $('#month').val() + " - " + $('#year').val();
-                var ptn = $("#kodeptn").val().split(" - ");
-                var prodi = $('#prodi').val().split(" - ");
-                $('#no-peserta-diterima').html(no);
-                $('#nama-peserta-diterima').html($('#nama').val().toUpperCase());
-                $('#tgllahir-peserta-diterima').html(tgl_lahir);
-                $('#kode-ptn-terima').html(ptn[0]);
-                $('#nama-ptn-terima').html(ptn[1]);
-                $('#kode-prodi-terima').html(prodi[0]);
-                $('#nama-prodi-terima').html(prodi[1]);
-                if($('#bidikmisi').val() != 'tidak') {
-                    $("#bidik-misi").show();
-                }
-            }
-        });
         
     </script>
 </body>
